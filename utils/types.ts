@@ -1,4 +1,4 @@
 export type StackParamList = {
   Start: undefined;
-  Chat: { name: string };
+  Chat: { name: string; backgroundColor: string };
 };
