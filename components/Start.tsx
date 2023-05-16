@@ -1,6 +1,6 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
 import {
+  Alert,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
@@ -8,17 +8,32 @@ import {
   Text,
   View,
 } from 'react-native';
+import { StartProps } from '../types/types';
 import { THEME_1, THEME_2, THEME_3, THEME_4 } from '../utils/colors';
-import { StackParamList } from '../utils/types';
 import ColorButton from './ColorButton';
 import NameInput from './NameInput';
 import StartChatButton from './StartChatButton';
-
-type StartProps = NativeStackScreenProps<StackParamList, 'Start'>;
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 const Start = ({ navigation }: StartProps) => {
   const [name, setName] = useState('');
   const [selectedTheme, setSelectedTheme] = useState(THEME_1);
+
+  // Authentication
+  const auth = getAuth();
+  const chatLogin = () => {
+    signInAnonymously(auth)
+      .then((result) => {
+        navigation.navigate('Chat', {
+          userID: result.user.uid,
+          name: name,
+          theme: selectedTheme,
+        });
+      })
+      .catch((error) => {
+        Alert.alert('Unable to sign in');
+      });
+  };
 
   return (
     <ImageBackground
@@ -52,14 +67,7 @@ const Start = ({ navigation }: StartProps) => {
                 handleSelect={setSelectedTheme}></ColorButton>
             </View>
           </View>
-          <StartChatButton
-            handlePress={() =>
-              navigation.navigate('Chat', {
-                name: name,
-                theme: selectedTheme,
-              })
-            }
-          />
+          <StartChatButton handlePress={chatLogin} />
         </View>
       </View>
       {
