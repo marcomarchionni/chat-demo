@@ -18,7 +18,7 @@ import { mapToMessage } from '../utils/utils';
 
 const Chat = ({ route, navigation, db }: ChatProps) => {
   const { userID, name, theme } = route.params;
-  const [messages, setMessages] = useState<IMessage[]>();
+  const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
     // Set the name chose by the user as screen title
@@ -38,7 +38,7 @@ const Chat = ({ route, navigation, db }: ChatProps) => {
     return () => {
       unsubMessages && unsubMessages();
     };
-  }, []);
+  }, [name]);
 
   const onSend = (newMessages: IMessage[]) => {
     addDoc(collection(db, 'messages'), newMessages[0]);

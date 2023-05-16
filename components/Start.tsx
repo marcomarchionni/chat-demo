@@ -29,6 +29,7 @@ const Start = ({ navigation }: StartProps) => {
           name: name,
           theme: selectedTheme,
         });
+        Alert.alert('Signed in successfully');
       })
       .catch((error) => {
         Alert.alert('Unable to sign in');
