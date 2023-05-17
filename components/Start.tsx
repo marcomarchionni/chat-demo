@@ -17,22 +17,24 @@ import { getAuth, signInAnonymously } from 'firebase/auth';
 
 const Start = ({ navigation }: StartProps) => {
   const [name, setName] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState(THEME_1);
+  const [theme, setTheme] = useState(THEME_1);
 
   // Authentication
   const auth = getAuth();
+
+  // Signin anonimously with Firebase Authentication
   const chatLogin = () => {
     signInAnonymously(auth)
       .then((result) => {
         navigation.navigate('Chat', {
           userID: result.user.uid,
-          name: name,
-          theme: selectedTheme,
+          name,
+          theme,
         });
-        Alert.alert('Signed in successfully');
+        // Alert.alert('Signed in successfully');
       })
       .catch((error) => {
-        Alert.alert('Unable to sign in');
+        Alert.alert('Unable to signin, try later');
       });
   };
 
@@ -52,27 +54,27 @@ const Start = ({ navigation }: StartProps) => {
             <View style={styles.colorButtonsContainer}>
               <ColorButton
                 theme={THEME_1}
-                selected={selectedTheme === THEME_1}
-                handleSelect={setSelectedTheme}></ColorButton>
+                selected={theme === THEME_1}
+                handleSelect={setTheme}></ColorButton>
               <ColorButton
                 theme={THEME_2}
-                selected={selectedTheme === THEME_2}
-                handleSelect={setSelectedTheme}></ColorButton>
+                selected={theme === THEME_2}
+                handleSelect={setTheme}></ColorButton>
               <ColorButton
                 theme={THEME_3}
-                selected={selectedTheme === THEME_3}
-                handleSelect={setSelectedTheme}></ColorButton>
+                selected={theme === THEME_3}
+                handleSelect={setTheme}></ColorButton>
               <ColorButton
                 theme={THEME_4}
-                selected={selectedTheme === THEME_4}
-                handleSelect={setSelectedTheme}></ColorButton>
+                selected={theme === THEME_4}
+                handleSelect={setTheme}></ColorButton>
             </View>
           </View>
           <StartChatButton handlePress={chatLogin} />
         </View>
       </View>
       {
-        /* Fix to avoid to cover input with keyboard on iOS */
+        /* Fix to avoid to cover text input with keyboard on iOS */
         Platform.OS === 'ios' ? (
           <KeyboardAvoidingView behavior="padding" />
         ) : null

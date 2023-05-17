@@ -1,12 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native';
-import Start from './components/Start';
-import Chat from './components/Chat';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StackParamList } from './types/types';
-import { FirebaseApp, initializeApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { StyleSheet } from 'react-native';
+import Chat from './components/Chat';
+import Start from './components/Start';
+import { StackParamList } from './types/types';
 
+// Initialize Stack for React Native Navigator
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const App = () => {

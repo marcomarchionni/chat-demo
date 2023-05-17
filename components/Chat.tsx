@@ -14,7 +14,7 @@ import {
   IMessage,
 } from 'react-native-gifted-chat';
 import { ChatProps } from '../types/types';
-import { mapToMessage } from '../utils/utils';
+import { mapToMessage as mapDataToMessage } from '../utils/utils';
 
 const Chat = ({ route, navigation, db }: ChatProps) => {
   const { userID, name, theme } = route.params;
@@ -24,13 +24,13 @@ const Chat = ({ route, navigation, db }: ChatProps) => {
     // Set the name chose by the user as screen title
     navigation.setOptions({ title: name });
 
-    // Define query
+    // Define query in Firestore
     const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
 
     const unsubMessages = onSnapshot(q, (documentSnapshot) => {
       let newMessages: IMessage[] = [];
       documentSnapshot.forEach((doc) => {
-        const message = mapToMessage(doc.id, doc.data());
+        const message = mapDataToMessage(doc.id, doc.data());
         newMessages.push(message);
       });
       setMessages(newMessages);
@@ -41,10 +41,11 @@ const Chat = ({ route, navigation, db }: ChatProps) => {
   }, [name]);
 
   const onSend = (newMessages: IMessage[]) => {
+    // Add messages to Firestore
     addDoc(collection(db, 'messages'), newMessages[0]);
   };
 
-  // Render bubble colors according to chosen theme
+  // Customize bubble colors based on the chosen theme
   const renderBubble = (props: BubbleProps<IMessage>) => {
     return (
       <Bubble
@@ -62,7 +63,7 @@ const Chat = ({ route, navigation, db }: ChatProps) => {
   };
 
   return (
-    // Background color is set according to the chosen theme
+    // Set the background color according to the chosen theme
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <GiftedChat
         messages={messages}
@@ -71,7 +72,7 @@ const Chat = ({ route, navigation, db }: ChatProps) => {
         user={{ _id: userID, name }}
       />
       {
-        /* Avoid keyboard to cover messages on old Androids */
+        /* Avoid the keyboard covering messages on older Android devices */
         Platform.OS === 'android' ? (
           <KeyboardAvoidingView behavior="height" />
         ) : null
