@@ -19,10 +19,10 @@ const Start = ({ navigation }: StartProps) => {
   const [name, setName] = useState('');
   const [theme, setTheme] = useState(THEME_1);
 
-  // Authentication
+  // Firebase Authentication instance
   const auth = getAuth();
 
-  // Signin anonimously with Firebase Authentication
+  // Sign in anonymously with Firebase Authentication
   const chatLogin = () => {
     signInAnonymously(auth)
       .then((result) => {
@@ -31,7 +31,6 @@ const Start = ({ navigation }: StartProps) => {
           name,
           theme,
         });
-        // Alert.alert('Signed in successfully');
       })
       .catch((error) => {
         Alert.alert('Unable to signin, try later');
@@ -74,7 +73,7 @@ const Start = ({ navigation }: StartProps) => {
         </View>
       </View>
       {
-        /* Fix to avoid to cover text input with keyboard on iOS */
+        /* Fix to avoid covering the text input with the keyboard on iOS */
         Platform.OS === 'ios' ? (
           <KeyboardAvoidingView behavior="padding" />
         ) : null

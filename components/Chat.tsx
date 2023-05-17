@@ -21,10 +21,10 @@ const Chat = ({ route, navigation, db }: ChatProps) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
-    // Set the name chose by the user as screen title
+    // Set the user-chosen name as the screen title
     navigation.setOptions({ title: name });
 
-    // Define query in Firestore
+    // Define Firestore query
     const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
 
     const unsubMessages = onSnapshot(q, (documentSnapshot) => {
