@@ -1,24 +1,28 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Theme } from '../utils/types';
 
 interface ColorButtonProps {
-  color: string;
+  theme: Theme;
   selected: boolean;
-  handleSelect: (color: string) => void;
+  handleSelect: (theme: Theme) => void;
 }
-const ColorButton = ({ color, selected, handleSelect }: ColorButtonProps) => {
+const ColorButton = ({ theme, selected, handleSelect }: ColorButtonProps) => {
   const getButtonStyle = () => {
     return [
       styles.outerButton,
-      selected && { borderColor: color, borderWidth: 2 },
+      selected && { borderColor: theme.background, borderWidth: 2 },
     ];
   };
 
   return (
     <TouchableOpacity
       style={getButtonStyle()}
-      onPress={() => handleSelect(color)}
-    >
-      <View style={[styles.innerButton, { backgroundColor: color }]}></View>
+      onPress={() => handleSelect(theme)}>
+      <View
+        style={[
+          styles.innerButton,
+          { backgroundColor: theme.background },
+        ]}></View>
     </TouchableOpacity>
   );
 };
@@ -29,9 +33,9 @@ const styles = StyleSheet.create({
     width: 48,
     borderRadius: 24,
     flex: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
     marginRight: 16,
   },
   innerButton: {

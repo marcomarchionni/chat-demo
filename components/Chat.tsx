@@ -1,22 +1,84 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { StyleSheet, View, Text } from "react-native";
-import { StackParamList } from "../utils/types";
-import { useEffect } from "react";
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useEffect, useState } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import {
+  Bubble,
+  BubbleProps,
+  GiftedChat,
+  IMessage,
+} from 'react-native-gifted-chat';
+import { StackParamList } from '../utils/types';
 
-type ChatProps = NativeStackScreenProps<StackParamList, "Chat">;
+type ChatProps = NativeStackScreenProps<StackParamList, 'Chat'>;
 
 const Chat = ({ route, navigation }: ChatProps) => {
-  const { name, backgroundColor } = route.params;
+  const { name, theme } = route.params;
+  const [messages, setMessages] = useState<IMessage[]>();
 
-  // Set the name chose by the user as screen title
   useEffect(() => {
+    // Set the name chose by the user as screen title
     navigation.setOptions({ title: name });
+
+    // Init static message
+    setMessages([
+      {
+        _id: 1,
+        text: 'Hello developer, how can I help you?',
+        createdAt: new Date(),
+        user: {
+          _id: 2,
+          name: 'React Native',
+          avatar: 'https://placeimg.com/140/140/any',
+        },
+      },
+      {
+        _id: 2,
+        text: 'Welcome to the Chat Room!',
+        createdAt: new Date(),
+        system: true,
+        user: { _id: 0 },
+      },
+    ]);
   }, []);
 
+  const onSend = (newMessages: IMessage[]) => {
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, newMessages),
+    );
+  };
+
+  // Render bubble colors according to chosen theme
+  const renderBubble = (props: BubbleProps<IMessage>) => {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: theme.bubbleRight,
+          },
+          left: {
+            backgroundColor: theme.bubbleLeft,
+          },
+        }}
+      />
+    );
+  };
+
   return (
-    // The background color is set according to the user's choice
-    <View style={[styles.container, { backgroundColor }]}>
-      <Text style={{ fontSize: 20, fontWeight: "600" }}>Chat!</Text>
+    // Background color is set according to the chosen theme
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <GiftedChat
+        messages={messages}
+        renderBubble={renderBubble}
+        onSend={(messages) => onSend(messages)}
+        user={{ _id: 1 }}
+      />
+      {
+        /* Avoid keyboard to cover messages on old Androids */
+        Platform.OS === 'android' ? (
+          <KeyboardAvoidingView behavior="height" />
+        ) : null
+      }
     </View>
   );
 };
@@ -24,8 +86,6 @@ const Chat = ({ route, navigation }: ChatProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
 
