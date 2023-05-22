@@ -1,4 +1,10 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import {
@@ -7,47 +13,39 @@ import {
   GiftedChat,
   IMessage,
 } from 'react-native-gifted-chat';
-import { StackParamList } from '../utils/types';
+import { ChatProps } from '../types/types';
+import { mapToMessage as mapDataToMessage } from '../utils/utils';
 
-type ChatProps = NativeStackScreenProps<StackParamList, 'Chat'>;
-
-const Chat = ({ route, navigation }: ChatProps) => {
-  const { name, theme } = route.params;
-  const [messages, setMessages] = useState<IMessage[]>();
+const Chat = ({ route, navigation, db }: ChatProps) => {
+  const { userID, name, theme } = route.params;
+  const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
-    // Set the name chose by the user as screen title
+    // Set the user-chosen name as the screen title
     navigation.setOptions({ title: name });
 
-    // Init static message
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello developer, how can I help you?',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
-      },
-      {
-        _id: 2,
-        text: 'Welcome to the Chat Room!',
-        createdAt: new Date(),
-        system: true,
-        user: { _id: 0 },
-      },
-    ]);
-  }, []);
+    // Define Firestore query
+    const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+
+    const unsubMessages = onSnapshot(q, (documentSnapshot) => {
+      let newMessages: IMessage[] = [];
+      documentSnapshot.forEach((doc) => {
+        const message = mapDataToMessage(doc.id, doc.data());
+        newMessages.push(message);
+      });
+      setMessages(newMessages);
+    });
+    return () => {
+      unsubMessages && unsubMessages();
+    };
+  }, [name]);
 
   const onSend = (newMessages: IMessage[]) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, newMessages),
-    );
+    // Add messages to Firestore
+    addDoc(collection(db, 'messages'), newMessages[0]);
   };
 
-  // Render bubble colors according to chosen theme
+  // Customize bubble colors based on the chosen theme
   const renderBubble = (props: BubbleProps<IMessage>) => {
     return (
       <Bubble
@@ -65,16 +63,16 @@ const Chat = ({ route, navigation }: ChatProps) => {
   };
 
   return (
-    // Background color is set according to the chosen theme
+    // Set the background color according to the chosen theme
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
         onSend={(messages) => onSend(messages)}
-        user={{ _id: 1 }}
+        user={{ _id: userID, name }}
       />
       {
-        /* Avoid keyboard to cover messages on old Androids */
+        /* Avoid the keyboard covering messages on older Android devices */
         Platform.OS === 'android' ? (
           <KeyboardAvoidingView behavior="height" />
         ) : null

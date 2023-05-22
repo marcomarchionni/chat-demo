@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Theme } from '../utils/types';
+import { Theme } from '../types/types';
 
 interface ColorButtonProps {
   theme: Theme;

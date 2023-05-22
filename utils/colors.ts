@@ -1,4 +1,4 @@
-import { Theme } from "./types";
+import { Theme } from "../types/types";
 
 export const BK_COLOR_1 = "#090C08";
 export const BK_COLOR_2 = "#474056";
