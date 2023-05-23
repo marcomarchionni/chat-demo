@@ -18,3 +18,16 @@ export const mapToMessage = (id: string, data: DocumentData) => {
   };
   return message;
 };
+
+export const isArrayOfIMessage = (value: unknown): value is IMessage[] => {
+  return Array.isArray(value) && value.length > 0 && value.every(isIMessage);
+};
+
+export const isIMessage = (value: unknown): value is IMessage => {
+  return (
+    Object.prototype.hasOwnProperty.call(value, '_id') &&
+    Object.prototype.hasOwnProperty.call(value, 'text') &&
+    Object.prototype.hasOwnProperty.call(value, 'createdAt') &&
+    Object.prototype.hasOwnProperty.call(value, 'user')
+  );
+};

@@ -16,7 +16,8 @@ export interface Theme {
 export type ChatProps = {
   navigation: NativeStackNavigationProp<StackParamList, "Chat", undefined>;
   route: RouteProp<StackParamList, "Chat">;
-  db: Firestore
+  db: Firestore;
+  isConnected: boolean | null;
 }
 
 export type StartProps = NativeStackScreenProps<StackParamList, 'Start'>;

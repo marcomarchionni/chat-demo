@@ -12,33 +12,80 @@ import {
   BubbleProps,
   GiftedChat,
   IMessage,
+  InputToolbar,
+  InputToolbarProps,
 } from 'react-native-gifted-chat';
 import { ChatProps } from '../types/types';
-import { mapToMessage as mapDataToMessage } from '../utils/utils';
+import {
+  isArrayOfIMessage,
+  mapToMessage as mapDataToMessage,
+} from '../utils/utils';
+import { Unsubscribe } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { handleError } from '../errors/error-handling';
 
-const Chat = ({ route, navigation, db }: ChatProps) => {
+const Chat = ({ route, navigation, db, isConnected }: ChatProps) => {
   const { userID, name, theme } = route.params;
   const [messages, setMessages] = useState<IMessage[]>([]);
+
+  const cacheMessages = async (messagesToCache: IMessage[]) => {
+    try {
+      await AsyncStorage.setItem('messages', JSON.stringify(messagesToCache));
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
+  const loadCachedMessages = async () => {
+    try {
+      const stringifiedMessages = await AsyncStorage.getItem('messages');
+      const cachedMessages =
+        stringifiedMessages && JSON.parse(stringifiedMessages);
+      if (isArrayOfIMessage(cachedMessages)) {
+        return cachedMessages;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      handleError(error);
+      return [];
+    }
+  };
+
+  let unsubMessages: Unsubscribe;
 
   useEffect(() => {
     // Set the user-chosen name as the screen title
     navigation.setOptions({ title: name });
 
-    // Define Firestore query
-    const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+    if (isConnected) {
+      // Unregister current listener
+      if (unsubMessages) unsubMessages();
 
-    const unsubMessages = onSnapshot(q, (documentSnapshot) => {
-      let newMessages: IMessage[] = [];
-      documentSnapshot.forEach((doc) => {
-        const message = mapDataToMessage(doc.id, doc.data());
-        newMessages.push(message);
+      // Define Firestore query
+      const firestoreQuery = query(
+        collection(db, 'messages'),
+        orderBy('createdAt', 'desc'),
+      );
+
+      // Setup new listener
+      unsubMessages = onSnapshot(firestoreQuery, (documentSnapshot) => {
+        let newMessages: IMessage[] = [];
+        documentSnapshot.forEach((doc) => {
+          const message = mapDataToMessage(doc.id, doc.data());
+          newMessages.push(message);
+        });
+        setMessages(newMessages);
+        cacheMessages(newMessages);
       });
-      setMessages(newMessages);
-    });
+    } else {
+      loadCachedMessages().then((messages) => setMessages(messages));
+    }
     return () => {
+      // Unregister listener on unmount
       unsubMessages && unsubMessages();
     };
-  }, [name]);
+  }, [isConnected]);
 
   const onSend = (newMessages: IMessage[]) => {
     // Add messages to Firestore
@@ -62,12 +109,19 @@ const Chat = ({ route, navigation, db }: ChatProps) => {
     );
   };
 
+  const renderInputToolbar = (props: InputToolbarProps<IMessage>) => {
+    if (isConnected) {
+      return <InputToolbar {...props} />;
+    } else return null;
+  };
+
   return (
     // Set the background color according to the chosen theme
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
+        renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
         user={{ _id: userID, name }}
       />
