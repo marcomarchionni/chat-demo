@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import {
+  ActionsProps,
   Bubble,
   BubbleProps,
   GiftedChat,
@@ -23,6 +24,7 @@ import {
 import { Unsubscribe } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleError } from '../errors/error-handling';
+import CustomActions from './CustomActions';
 
 const Chat = ({ route, navigation, db, isConnected }: ChatProps) => {
   const { userID, name, theme } = route.params;
@@ -115,6 +117,10 @@ const Chat = ({ route, navigation, db, isConnected }: ChatProps) => {
     } else return null;
   };
 
+  const renderCustomActions = (props: ActionsProps) => {
+    return <CustomActions {...props} />;
+  };
+
   return (
     // Set the background color according to the chosen theme
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -122,6 +128,7 @@ const Chat = ({ route, navigation, db, isConnected }: ChatProps) => {
         messages={messages}
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
+        renderActions={renderCustomActions}
         onSend={(messages) => onSend(messages)}
         user={{ _id: userID, name }}
       />
