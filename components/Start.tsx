@@ -8,12 +8,14 @@ import {
   Text,
   View,
 } from 'react-native';
-import { StartProps } from '../types/types';
+
+import { getAuth, signInAnonymously } from 'firebase/auth';
+
 import { THEME_1, THEME_2, THEME_3, THEME_4 } from '../utils/colors';
 import ColorButton from './ColorButton';
 import NameInput from './NameInput';
 import StartChatButton from './StartChatButton';
-import { getAuth, signInAnonymously } from 'firebase/auth';
+import { StartProps } from '../types/types';
 
 const Start = ({ navigation }: StartProps) => {
   const [name, setName] = useState('');
@@ -43,8 +45,8 @@ const Start = ({ navigation }: StartProps) => {
       style={styles.backgroundImage}
       resizeMode="cover">
       <View style={styles.container}>
-        <View style={styles.box}>
-          <Text style={styles.appTitle}>Chat App</Text>
+        <View style={[styles.box, styles.titleBox]}>
+          <Text style={styles.appTitle}>Chat</Text>
         </View>
         <View style={[styles.box, styles.inputBox]}>
           <NameInput setName={setName}></NameInput>
@@ -90,22 +92,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-around',
   },
   box: {
-    height: '44%',
     width: '88%',
     alignItems: 'center',
     justifyContent: 'space-around',
   },
   inputBox: {
     backgroundColor: 'white',
+    flexBasis: 280,
+  },
+  titleBox: {
+    flexBasis: '44%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 1,
   },
   appTitle: {
-    fontSize: 45,
-    fontWeight: '600',
+    fontSize: 50,
+    fontWeight: '800',
     color: '#fff',
-    padding: 20,
+    paddingTop: 20,
+    letterSpacing: 2,
   },
   boxItem: {
     width: '88%',

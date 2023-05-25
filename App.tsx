@@ -1,37 +1,32 @@
+import { useEffect } from 'react';
+import { Alert, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useNetInfo } from '@react-native-community/netinfo';
+
 import { initializeApp } from 'firebase/app';
 import {
   getFirestore,
   disableNetwork,
   enableNetwork,
 } from 'firebase/firestore';
-import { Alert, StyleSheet } from 'react-native';
+import { getStorage } from 'firebase/storage';
+
 import Chat from './components/Chat';
 import Start from './components/Start';
 import { StackParamList } from './types/types';
-import { useNetInfo } from '@react-native-community/netinfo';
-import { useEffect } from 'react';
+import { FIREBASE_CONFIG } from './utils/firebaseConfig';
 
 // Initialize Stack for React Native Navigator
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const App = () => {
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: 'AIzaSyAQCM9PiUWq3kk1u99vdVZ2DxBO9gLAJ3w',
-    authDomain: 'chat-app-4ec1d.firebaseapp.com',
-    projectId: 'chat-app-4ec1d',
-    storageBucket: 'chat-app-4ec1d.appspot.com',
-    messagingSenderId: '481704406944',
-    appId: '1:481704406944:web:0682472b6b05b5d218fec5',
-  };
-
   // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
+  const app = initializeApp(FIREBASE_CONFIG);
 
-  // Initialize Cloud Firestore and get a reference to the service
+  // Initialize Cloud Firestore and storage and get a reference to the services
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   const connectionStatus = useNetInfo();
 
@@ -55,6 +50,7 @@ const App = () => {
           {(props) => (
             <Chat
               db={db}
+              storage={storage}
               isConnected={connectionStatus.isConnected}
               {...props}
             />

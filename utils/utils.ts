@@ -1,8 +1,9 @@
 import { DocumentData } from 'firebase/firestore';
 import { IMessage } from 'react-native-gifted-chat';
+import { ChatMessage } from '../types/types';
 
-export const mapToMessage = (id: string, data: DocumentData) => {
-  const message: IMessage = {
+export const mapDataToMessage = (id: string, data: DocumentData) => {
+  const message: ChatMessage = {
     _id: id, // Use the document ID as the message ID
     text: data.text,
     createdAt: data.createdAt.toDate(), // Convert Firestore Timestamp to JavaScript Date
@@ -15,15 +16,18 @@ export const mapToMessage = (id: string, data: DocumentData) => {
     received: data.received && data.received,
     pending: data.pending && data.pending,
     quickReplies: data.quickReplies && data.quickReplies,
+    location: data.location && data.location,
   };
   return message;
 };
 
-export const isArrayOfIMessage = (value: unknown): value is IMessage[] => {
-  return Array.isArray(value) && value.length > 0 && value.every(isIMessage);
+export const isArrayOfChatMessage = (
+  value: unknown,
+): value is ChatMessage[] => {
+  return Array.isArray(value) && value.length > 0 && value.every(isChatMessage);
 };
 
-export const isIMessage = (value: unknown): value is IMessage => {
+export const isChatMessage = (value: unknown): value is ChatMessage => {
   return (
     Object.prototype.hasOwnProperty.call(value, '_id') &&
     Object.prototype.hasOwnProperty.call(value, 'text') &&

@@ -1,9 +1,84 @@
-import { TouchableOpacity, StyleSheet, View, Text } from 'react-native';
-import { ActionsProps } from 'react-native-gifted-chat';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CustomActionsProps } from '../types/types';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
-const CustomActions = ({ wrapperStyle, iconTextStyle }: ActionsProps) => {
+const CustomActions = ({
+  wrapperStyle,
+  iconTextStyle,
+  storage,
+  userID,
+  onSend,
+}: CustomActionsProps) => {
   const actionSheet = useActionSheet();
+
+  const generateReference = (uri: string) => {
+    const timeStamp = new Date().getTime();
+    const imageName = uri.split('/')[uri.split('/').length - 1];
+    return `${userID}-${timeStamp}-${imageName}`;
+  };
+
+  const uploadAndSendImage = async (imageUri: string) => {
+    // convert image to blob
+    const response = await fetch(imageUri);
+    const blob = await response.blob();
+
+    // Upload image to Firebase storage
+    const uniqueRefString = generateReference(imageUri);
+    const newUploadRef = ref(storage, uniqueRefString);
+    uploadBytes(newUploadRef, blob).then(async (snapshot) => {
+      console.log('File has been uploaded successfully');
+      const imageUrl = await getDownloadURL(snapshot.ref);
+      onSend({ image: imageUrl });
+    });
+  };
+
+  const pickImage = async () => {
+    let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissions?.granted) {
+      let result = await ImagePicker.launchImageLibraryAsync();
+      if (!result.canceled) {
+        await uploadAndSendImage(result.assets[0].uri);
+      }
+    } else {
+      Alert.alert("Permissions haven't been granted");
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      const permissions = await ImagePicker.requestCameraPermissionsAsync();
+      if (permissions?.granted) {
+        const result = await ImagePicker.launchCameraAsync();
+        if (!result?.canceled) {
+          await uploadAndSendImage(result.assets[0].uri);
+        }
+      } else {
+        Alert.alert("Permissions haven't been granted");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getLocation = async () => {
+    let permissions = await Location.requestForegroundPermissionsAsync();
+
+    if (permissions?.granted) {
+      const location = await Location.getCurrentPositionAsync({});
+      if (location) {
+        onSend({
+          location: {
+            longitude: location.coords.longitude,
+            latitude: location.coords.latitude,
+          },
+        });
+      } else Alert.alert('Error occurred while fetching location');
+    } else Alert.alert("Permissions haven't been granted.");
+  };
+
   const onActionPress = () => {
     const options = [
       'Choose From Library',
@@ -20,13 +95,13 @@ const CustomActions = ({ wrapperStyle, iconTextStyle }: ActionsProps) => {
       async (buttonIndex) => {
         switch (buttonIndex) {
           case 0:
-            console.log('User wants to pick an image');
+            pickImage();
             return;
           case 1:
-            console.log('User wants to take a photo');
+            takePhoto();
             return;
           case 2:
-            console.log('User wants to send location');
+            getLocation();
             return;
           default:
         }
@@ -34,7 +109,13 @@ const CustomActions = ({ wrapperStyle, iconTextStyle }: ActionsProps) => {
     );
   };
   return (
-    <TouchableOpacity style={styles.container} onPress={onActionPress}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onActionPress}
+      accessible={true}
+      accessibilityLabel="View Actions"
+      accessibilityHint="Choose if you want to upload an image, take a photo or share your location"
+      accessibilityRole="button">
       <View style={[styles.wrapper, wrapperStyle]}>
         <Text style={[styles.iconText, iconTextStyle]}>+</Text>
       </View>
