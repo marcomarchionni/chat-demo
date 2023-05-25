@@ -114,7 +114,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#fff',
     paddingTop: 20,
-    letterSpacing: 2,
   },
   boxItem: {
     width: '88%',

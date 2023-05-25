@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CustomActionsProps } from '../types/types';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { handleError } from '../errors/error-handling';
 
 const CustomActions = ({
   wrapperStyle,
@@ -59,7 +60,7 @@ const CustomActions = ({
         Alert.alert("Permissions haven't been granted");
       }
     } catch (error) {
-      console.error(error);
+      handleError(error);
     }
   };
 
