@@ -15,14 +15,14 @@ import { getStorage } from 'firebase/storage';
 import Chat from './components/Chat';
 import Start from './components/Start';
 import { StackParamList } from './types/types';
-import { FIREBASE_CONFIG } from './utils/firebaseConfig';
+import { firebaseConfig } from './firebase.config.js';
 
 // Initialize Stack for React Native Navigator
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const App = () => {
   // Initialize Firebase
-  const app = initializeApp(FIREBASE_CONFIG);
+  const app = initializeApp(firebaseConfig);
 
   // Initialize Cloud Firestore and storage and get a reference to the services
   const db = getFirestore(app);
