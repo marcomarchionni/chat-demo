@@ -77,7 +77,7 @@ export const firebaseConfig = {
 5. In the "SDK Tools" tab, select "Android SDK Build-Tools", "Android Emulator", and "Android SDK Platform Tools".
 6. For Mac users: Copy the Android SDK location from the same window and add the following lines to your `.zprofile` or `.zshrc` file:
 
-```
+```bash
 export ANDROID_SDK=/YOUR/ANDROID/SDK/LOCATION
 export PATH=$ANDROID_SDK/platform-tools:$PATH
 ```
