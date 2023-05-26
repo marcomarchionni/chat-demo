@@ -41,21 +41,24 @@ const CustomActions = ({
 
   // Pick image from media library
   const pickImage = async () => {
-    let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissions?.granted) {
-      let result = await ImagePicker.launchImageLibraryAsync();
-      if (!result.canceled) {
-        await uploadAndSendImage(result.assets[0].uri);
+    try {
+      let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissions?.granted) {
+        let result = await ImagePicker.launchImageLibraryAsync();
+        if (!result.canceled) {
+          await uploadAndSendImage(result.assets[0].uri);
+        }
+      } else {
+        Alert.alert("Permissions haven't been granted");
       }
-    } else {
-      Alert.alert("Permissions haven't been granted");
+    } catch (error) {
+      handleError(error);
     }
   };
 
   const takePhoto = async () => {
     try {
       const permissions = await ImagePicker.requestCameraPermissionsAsync();
-      console.log(permissions);
       if (permissions && permissions.granted) {
         const result = await ImagePicker.launchCameraAsync();
         if (!result?.canceled) {
@@ -70,19 +73,23 @@ const CustomActions = ({
   };
 
   const sendLocation = async () => {
-    let permissions = await Location.requestForegroundPermissionsAsync();
+    try {
+      let permissions = await Location.requestForegroundPermissionsAsync();
 
-    if (permissions?.granted) {
-      const location = await Location.getCurrentPositionAsync({});
-      if (location) {
-        onSend({
-          location: {
-            longitude: location.coords.longitude,
-            latitude: location.coords.latitude,
-          },
-        });
-      } else Alert.alert('Error occurred while fetching location');
-    } else Alert.alert("Permissions haven't been granted.");
+      if (permissions?.granted) {
+        const location = await Location.getCurrentPositionAsync({});
+        if (location) {
+          onSend({
+            location: {
+              longitude: location.coords.longitude,
+              latitude: location.coords.latitude,
+            },
+          });
+        } else Alert.alert('Error occurred while fetching location');
+      } else Alert.alert("Permissions haven't been granted.");
+    } catch (error) {
+      handleError(error);
+    }
   };
 
   const onActionPress = () => {
