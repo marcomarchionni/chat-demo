@@ -51,7 +51,8 @@ const CustomActions = ({
   const takePhoto = async () => {
     try {
       const permissions = await ImagePicker.requestCameraPermissionsAsync();
-      if (permissions?.granted) {
+      console.log(permissions);
+      if (permissions && permissions.granted) {
         const result = await ImagePicker.launchCameraAsync();
         if (!result?.canceled) {
           await uploadAndSendImage(result.assets[0].uri);
