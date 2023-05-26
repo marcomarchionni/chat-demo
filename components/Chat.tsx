@@ -19,19 +19,20 @@ import {
   query,
 } from 'firebase/firestore';
 
+import { isArrayOfChatMessage, mapDataToMessage } from '../utils/utils';
+import { handleError } from '../errors/error-handling';
+import CustomActions from './CustomActions';
 import {
   ChatMessage,
   ChatProps,
   RenderCustomActionsProps,
 } from '../types/types';
-import { isArrayOfChatMessage, mapDataToMessage } from '../utils/utils';
-import { handleError } from '../errors/error-handling';
-import CustomActions from './CustomActions';
 
 const Chat = ({ route, navigation, db, storage, isConnected }: ChatProps) => {
   const { userID, name, theme } = route.params;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
+  // Cache messages for offline use
   const cacheMessages = async (messagesToCache: ChatMessage[]) => {
     try {
       await AsyncStorage.setItem('messages', JSON.stringify(messagesToCache));
@@ -40,6 +41,7 @@ const Chat = ({ route, navigation, db, storage, isConnected }: ChatProps) => {
     }
   };
 
+  // Load cached messages when offline
   const loadCachedMessages = async () => {
     try {
       const stringifiedMessages = await AsyncStorage.getItem('messages');
@@ -72,7 +74,7 @@ const Chat = ({ route, navigation, db, storage, isConnected }: ChatProps) => {
         orderBy('createdAt', 'desc'),
       );
 
-      // Setup new listener
+      // Setup new Firestore listener
       unsubMessages = onSnapshot(firestoreQuery, (documentSnapshot) => {
         let newMessages: ChatMessage[] = [];
         documentSnapshot.forEach((doc) => {
@@ -91,8 +93,8 @@ const Chat = ({ route, navigation, db, storage, isConnected }: ChatProps) => {
     };
   }, [isConnected]);
 
+  // Add messages to Firestore
   const addMessages = (newMessages: ChatMessage[]) => {
-    // Add messages to Firestore
     addDoc(collection(db, 'messages'), newMessages[0]);
   };
 
@@ -113,19 +115,21 @@ const Chat = ({ route, navigation, db, storage, isConnected }: ChatProps) => {
     );
   };
 
+  // Hide Input Toolbar when offline
   const renderInputToolbar = (props: InputToolbarProps<ChatMessage>) => {
     if (isConnected) {
       return <InputToolbar {...props} />;
     } else {
-      // Hide Input Toolbar when offline
       return null;
     }
   };
 
+  // Add a 'More Actions' button to input toolbar
   const renderCustomActions = (props: RenderCustomActionsProps) => {
     return <CustomActions storage={storage} userID={userID} {...props} />;
   };
 
+  // Render location message
   const renderCustomView = (props: Readonly<BubbleProps<ChatMessage>>) => {
     const { currentMessage } = props;
     if (currentMessage?.location) {

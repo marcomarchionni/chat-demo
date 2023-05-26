@@ -1,10 +1,10 @@
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { CustomActionsProps } from '../types/types';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { handleError } from '../errors/error-handling';
+import { CustomActionsProps } from '../types/types';
 
 const CustomActions = ({
   wrapperStyle,
@@ -15,6 +15,7 @@ const CustomActions = ({
 }: CustomActionsProps) => {
   const actionSheet = useActionSheet();
 
+  // Generate unique reference to store image in Firebase Storage
   const generateReference = (uri: string) => {
     const timeStamp = new Date().getTime();
     const imageName = uri.split('/')[uri.split('/').length - 1];
@@ -22,7 +23,7 @@ const CustomActions = ({
   };
 
   const uploadAndSendImage = async (imageUri: string) => {
-    // convert image to blob
+    // Convert image to blob
     const response = await fetch(imageUri);
     const blob = await response.blob();
 
@@ -32,10 +33,13 @@ const CustomActions = ({
     uploadBytes(newUploadRef, blob).then(async (snapshot) => {
       console.log('File has been uploaded successfully');
       const imageUrl = await getDownloadURL(snapshot.ref);
+
+      // Send message with image url
       onSend({ image: imageUrl });
     });
   };
 
+  // Pick image from media library
   const pickImage = async () => {
     let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissions?.granted) {
@@ -65,7 +69,7 @@ const CustomActions = ({
     }
   };
 
-  const getLocation = async () => {
+  const sendLocation = async () => {
     let permissions = await Location.requestForegroundPermissionsAsync();
 
     if (permissions?.granted) {
@@ -103,7 +107,7 @@ const CustomActions = ({
             takePhoto();
             return;
           case 2:
-            getLocation();
+            sendLocation();
             return;
           default:
         }
