@@ -15,7 +15,7 @@ import { getStorage } from 'firebase/storage';
 import Chat from './components/Chat';
 import Start from './components/Start';
 import { StackParamList } from './types/types';
-import { firebaseConfig } from './firebase.config.js';
+import { firebaseConfig } from './firebase.config';
 
 // Initialize Stack for React Native Navigator
 const Stack = createNativeStackNavigator<StackParamList>();
