@@ -73,7 +73,7 @@ export const firebaseConfig = {
 1. Install Android Studio on your local machine.
 2. From the Welcome screen, click on "More Actions" and select "SDK Manager".
 3. On the "SDK Platforms" tab, check "Show Package Details" in the bottom right corner.
-4. Choose an Android Platform Package (Android 12L recommended) and select "Android SDK Platform", "Sources for Android", "Google APIs System Image", and "Google Play System Image" (choose according to your system).
+4. Choose an Android Platform Package (Android 12L recommended\*) and select "Android SDK Platform", "Sources for Android", "Google APIs System Image", and "Google Play System Image" (choose according to your system).
 5. In the "SDK Tools" tab, select "Android SDK Build-Tools", "Android Emulator", and "Android SDK Platform Tools".
 6. For Mac users: Copy the Android SDK location from the same window and add the following lines to your `.zprofile` or `.zshrc` file:
 
@@ -84,10 +84,12 @@ export PATH=$ANDROID_SDK/platform-tools:$PATH
 
 7. After installing the relevant packages, go back to the Welcome screen, click on "More Actions", and select "Virtual Device Manager".
 8. Click on "Create Device" and select a newer device with the Play Store icon. Choose Next.
-9. Select a platform. "Sv2" is recommended.
+9. Select a platform. "Sv2" is recommended\*.
 10. In the "Verify Configuration" window, click on "Show Advanced Settings".
 11. In the "Memory and Storage" section, change both "Internal Storage" and "SD card" to 4096. Click "Finish".
 12. In the Device Manager, start your newly created emulator.
+
+\* Emulator based on SDK Platform 13 (Tiramisu) may be subject to [this issue](https://github.com/expo/expo/issues/21544)
 
 ### 3. Setup local project
 
