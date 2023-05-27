@@ -18,7 +18,7 @@ The Chat App allows users to enter a chat room, exchange messages with other use
 
 - User-friendly interface: Users can enter their name, choose a theme color, and easily access the chat room.
 - Real-time messaging: Users can exchange text messages in real-time.
-- Image sharing: With appropriate permissions, users can share images from their device's media library or capture photos using the device camera.
+- Image sharing: If users grant the necessary permissions, they can share images from their device's media library or capture photos using the device camera.
 - Location sharing: Users can share their current location with others.
 - Offline messaging: Even when offline, users can still read and access previous conversations.
 - Screen reader compatibility: The app is designed to be accessible and compatible with screen readers for users with visual impairments.
@@ -28,7 +28,7 @@ The Chat App allows users to enter a chat room, exchange messages with other use
 The app is built with the following technologies:
 
 - Node.js 18.16.0
-- Expo 48
+- Expo 48.0.15
 - React Native 0.71.8
 - Firebase ^9.13.0
 - TypeScript ^4.9.4
@@ -41,7 +41,7 @@ It utilizes the following Firebase services:
 
 The chat interface and functionality are created using [Gifted Chat](https://github.com/FaridSafi/react-native-gifted-chat), a popular and highly customizable React Native library for chat applications.
 
-## Project Setup
+## Dev Environment Setup
 
 ### 1. Setup Firebase Project
 
