@@ -26,17 +26,21 @@ const Start = ({ navigation }: StartProps) => {
 
   // Sign in anonymously with Firebase Authentication
   const chatLogin = () => {
-    signInAnonymously(auth)
-      .then((result) => {
-        navigation.navigate('Chat', {
-          userID: result.user.uid,
-          name,
-          theme,
+    if (name) {
+      signInAnonymously(auth)
+        .then((result) => {
+          navigation.navigate('Chat', {
+            userID: result.user.uid,
+            name,
+            theme,
+          });
+        })
+        .catch((error) => {
+          Alert.alert('Unable to signin, try later');
         });
-      })
-      .catch((error) => {
-        Alert.alert('Unable to signin, try later');
-      });
+    } else {
+      Alert.alert('Please enter your name!');
+    }
   };
 
   return (
