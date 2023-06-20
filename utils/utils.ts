@@ -24,13 +24,16 @@ export const mapDataToMessage = (id: string, data: DocumentData) => {
 export const isArrayOfChatMessage = (
   value: unknown,
 ): value is ChatMessage[] => {
-  return Array.isArray(value) && value.length > 0 && value.every(isChatMessage);
+  const isArray = Array.isArray(value);
+  const LengthMoreThanZero = isArray && value.length > 0;
+  const isArrayOfMessages = isArray && value.every(isChatMessage);
+  console.log({ isArray, LengthMoreThanZero, isArrayOfMessages });
+  return LengthMoreThanZero && isArrayOfMessages;
 };
 
 export const isChatMessage = (value: unknown): value is ChatMessage => {
   return (
     Object.prototype.hasOwnProperty.call(value, '_id') &&
-    Object.prototype.hasOwnProperty.call(value, 'text') &&
     Object.prototype.hasOwnProperty.call(value, 'createdAt') &&
     Object.prototype.hasOwnProperty.call(value, 'user')
   );
